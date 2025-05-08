@@ -28,6 +28,7 @@ public class UserDAO implements DAO{
 
     @Override
     public void save(User user) {
+
         entityManager.persist(user);
     }
 
@@ -35,8 +36,9 @@ public class UserDAO implements DAO{
     public void update(Long id, User updatedUser) {
         User user = entityManager.find(User.class, id);
         user.setAge(updatedUser.getAge());
-        user.setName(updatedUser.getName());
         user.setLastName(updatedUser.getLastName());
+        user.setName(updatedUser.getName());
+        user.setUsername(updatedUser.getUsername());
     }
 
     @Override

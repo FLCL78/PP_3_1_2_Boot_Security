@@ -10,7 +10,7 @@ import java.util.Optional;
 // Для поиска человека по имени и фамилии.
 // В целом мб всё сюда перенести?...
 @Repository
-public interface UserRepository extends JpaRepository {
+public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByUsername(String username);
 }

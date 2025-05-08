@@ -13,9 +13,9 @@ import ru.kata.spring.boot_security.demo.services.ServiceBase;
 @RequestMapping("/admin")
 public class AdminController {
 
-    @Autowired
-    private final ServiceBase serviceBase;
 
+    private final ServiceBase serviceBase;
+    @Autowired
     public AdminController(ServiceBase serviceBase) {
         this.serviceBase = serviceBase;
     }

@@ -7,7 +7,7 @@
 <body>
 <h2>Форма обновления пользователя</h2>
 
-<form th:method="post" th:action="@{/templates/admin/update(id = ${user.getId()})}" th:object="${user}" >
+<form th:method="post" th:action="@{/admin/update(id = ${user.getId()})}" th:object="${user}" >
     <label for="username">Введите никнейм: </label>
     <input type="text" th:field="*{username}" id="username">
     <br/>
@@ -25,7 +25,7 @@
 
 </form>
 
-<a th:href="@{/templates/admin}">Назад к списку</a>
+<a th:href="@{/admin}">Назад к списку</a>
 
 </body>
 </html>

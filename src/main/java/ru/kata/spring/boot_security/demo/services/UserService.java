@@ -49,6 +49,9 @@ public class UserService implements ServiceBase{
     @Override
     @Transactional
     public void delete(Long id) {
+        User user = userDao.show(id);
+        user.getRoles().forEach(role -> role.getUsers().remove(user));
+        userDao.save(user);
         userDao.delete(id);
     }
 }

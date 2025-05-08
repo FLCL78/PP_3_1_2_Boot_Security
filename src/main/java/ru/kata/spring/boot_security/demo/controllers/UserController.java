@@ -12,15 +12,15 @@ import ru.kata.spring.boot_security.demo.services.ServiceBase;
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    private final ServiceBase serviceBase;
 
+    private final ServiceBase serviceBase;
+    @Autowired
     public UserController(ServiceBase serviceBase) {
         this.serviceBase = serviceBase;
     }
 
-    @GetMapping()
-   public String showUser(@RequestParam("id") Long id, Model model) {
+    @GetMapping("/{id}")
+   public String showUser(@PathVariable("id") Long id, Model model) {
         model.addAttribute("user", serviceBase.show(id));
     return "users/user";
    }
