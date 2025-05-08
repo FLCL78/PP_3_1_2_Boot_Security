@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -35,7 +36,7 @@ public class User implements UserDetails {
     private String password;
 
     @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     public User() {
     }
@@ -149,5 +150,10 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void addRole(Role role) {
+        this.roles.add(role);
+        role.getUsers().add(this);
     }
 }

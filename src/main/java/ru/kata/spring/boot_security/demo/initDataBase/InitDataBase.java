@@ -8,7 +8,8 @@ import ru.kata.spring.boot_security.demo.dao.UserRepository;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 
-import java.util.Set;
+import java.util.HashSet;
+
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -27,12 +28,31 @@ public class InitDataBase {
 
     @PostConstruct
     public void userToBase() {
-        User adminUser = new User("admin", "Василий", "Долговязый", 55, "admin", Set.of(new Role("ROLE_ADMIN"), new Role("ROLE_USER")));
-        User adminOnly = new User("adminOnly", "Ахтубей", "Креплидзе", 22, "adminOnly", Set.of(new Role("ROLE_ADMIN")));
-        User user = new User("user", "user", "userevich", 33, "user", Set.of(new Role("ROLE_USER")));
+        //Записали в базу
+        Role roleAdmin = roleRepository.findByRole("ROLE_ADMIN")
+                .orElseGet(() -> roleRepository.save(new Role("ROLE_ADMIN")));
+        Role roleUser = roleRepository.findByRole("ROLE_USER")
+                .orElseGet(() -> roleRepository.save(new Role("ROLE_USER")));
+
+        //Записали в базу
+        User adminUser = new User("admin", "Василий", "Долговязый", 55, "admin", new HashSet<>());
+        User adminOnly = new User("adminOnly", "Ахтубей", "Креплидзе", 22, "adminOnly", new HashSet<>());
+        User user = new User("user", "user", "userevich", 33, "user", new HashSet<>());
+
         userRepository.save(adminUser);
         userRepository.save(adminOnly);
         userRepository.save(user);
+
+        //Связь
+        roleAdmin.addUser(adminUser);
+        roleAdmin.addUser(adminOnly);
+        roleUser.addUser(adminUser);
+        roleUser.addUser(user);
+
+        //Подтверждение связи с другой стороны
+        roleRepository.save(roleAdmin);
+        roleRepository.save(roleUser);
+
     }
 
     @PreDestroy
