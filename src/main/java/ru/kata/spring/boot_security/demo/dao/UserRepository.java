@@ -1,0 +1,16 @@
+package ru.kata.spring.boot_security.demo.dao;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import ru.kata.spring.boot_security.demo.model.User;
+
+import java.util.Optional;
+
+
+// Для поиска человека по имени и фамилии.
+// В целом мб всё сюда перенести?...
+@Repository
+public interface UserRepository extends JpaRepository {
+
+    Optional<User> findByUsername(String username);
+}
