@@ -3,7 +3,7 @@ package ru.kata.spring.boot_security.demo.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.kata.spring.boot_security.demo.dao.DAO;
+import ru.kata.spring.boot_security.demo.dao.UserRepository;
 import ru.kata.spring.boot_security.demo.model.User;
 
 
@@ -14,24 +14,24 @@ import java.util.List;
 public class UserService implements ServiceBase{
 
 
-    private final DAO userDao;
+    private final UserRepository userDao;
 
 
     @Autowired
-    public UserService(DAO userDao) {
+    public UserService(UserRepository userDao) {
         this.userDao = userDao;
     }
 
     @Override
     @Transactional
     public List<User> index() {
-        return userDao.index();
+        return userDao.findAll();
     }
 
     @Override
     @Transactional
     public User show(Long id) {
-        return userDao.show(id);
+        return userDao.getById(id);
     }
 
     @Override
@@ -43,15 +43,17 @@ public class UserService implements ServiceBase{
     @Override
     @Transactional
     public void update(Long id, User updatedUser) {
-        userDao.update(id,updatedUser);
+        User user = userDao.findById(id).orElseThrow();
+        updatedUser.setId(user.getId());
+        userDao.save(updatedUser);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
-        User user = userDao.show(id);
+        User user = userDao.findById(id).orElseThrow();
         user.getRoles().forEach(role -> role.getUsers().remove(user));
         userDao.save(user);
-        userDao.delete(id);
+        userDao.delete(user);
     }
 }

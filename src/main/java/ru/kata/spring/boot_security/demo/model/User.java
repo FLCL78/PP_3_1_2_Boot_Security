@@ -1,12 +1,11 @@
 package ru.kata.spring.boot_security.demo.model;
 
-import jakarta.persistence.*;
-import org.hibernate.annotations.Cascade;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.*;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 
@@ -35,7 +34,7 @@ public class User implements UserDetails {
     @Column (name = "password")
     private String password;
 
-    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
     private Set<Role> roles;
 
     public User() {
@@ -45,6 +44,15 @@ public class User implements UserDetails {
         this.name = name;
         this.lastName = lastName;
         this.age = age;
+    }
+
+    public User(String username, String name, String lastName, int age, String password, Set<Role> roles) {
+        this.username = username;
+        this.name = name;
+        this.lastName = lastName;
+        this.age = age;
+        this.password = password;
+        this.roles = roles;
     }
 
     public Long getId() {
@@ -121,5 +129,25 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return this.username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
