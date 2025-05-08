@@ -9,6 +9,7 @@ import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 
 import java.util.HashSet;
+import java.util.Set;
 
 
 import javax.annotation.PostConstruct;
@@ -35,23 +36,13 @@ public class InitDataBase {
                 .orElseGet(() -> roleRepository.save(new Role("ROLE_USER")));
 
         //Записали в базу
-        User adminUser = new User("admin", "Василий", "Долговязый", 55, "admin", new HashSet<>());
-        User adminOnly = new User("adminOnly", "Ахтубей", "Креплидзе", 22, "adminOnly", new HashSet<>());
-        User user = new User("user", "user", "userevich", 33, "user", new HashSet<>());
+        User adminUser = new User("admin", "Василий", "Долговязый", 55, "admin", Set.of(roleAdmin, roleUser));
+        User adminOnly = new User("adminOnly", "Ахтубей", "Креплидзе", 22, "adminOnly",Set.of(roleAdmin));
+        User user = new User("user", "user", "userevich", 33, "user", Set.of(roleUser));
 
         userRepository.save(adminUser);
         userRepository.save(adminOnly);
         userRepository.save(user);
-
-        //Связь
-        roleAdmin.addUser(adminUser);
-        roleAdmin.addUser(adminOnly);
-        roleUser.addUser(adminUser);
-        roleUser.addUser(user);
-
-        //Подтверждение связи с другой стороны
-        roleRepository.save(roleAdmin);
-        roleRepository.save(roleUser);
 
     }
 

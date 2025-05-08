@@ -35,16 +35,15 @@ public class User implements UserDetails {
     @Column (name = "password")
     private String password;
 
-    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     private Set<Role> roles = new HashSet<>();
 
     public User() {
-    }
-
-    public User(String name, String lastName, int age) {
-        this.name = name;
-        this.lastName = lastName;
-        this.age = age;
     }
 
     public User(String username, String name, String lastName, int age, String password, Set<Role> roles) {
@@ -152,8 +151,4 @@ public class User implements UserDetails {
         return true;
     }
 
-    public void addRole(Role role) {
-        this.roles.add(role);
-        role.getUsers().add(this);
-    }
 }

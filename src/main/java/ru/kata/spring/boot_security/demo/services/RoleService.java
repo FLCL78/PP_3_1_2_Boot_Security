@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.dao.RoleRepository;
 import ru.kata.spring.boot_security.demo.model.Role;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -28,5 +29,14 @@ public class RoleService {
     public void save(Role role) {
         roleRepository.save(role);
     }
+    @Transactional
+    public List<Role> findAll() {
+        return roleRepository.findAll();
+    }
+    @Transactional
+    public Role findById(Long id) {
+        return roleRepository.getById(id);
+    }
+
 
 }

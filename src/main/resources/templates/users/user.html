@@ -18,10 +18,11 @@
     </thead>
 
     <tbody>
-        <td th:text = "${user.getUsername()}"></td>
-        <td th:text ="${user.getName()}"></td>
-        <td th:text ="${user.getLastName()}"></td>
-        <td th:text ="${user.getAge()}"></td>
+        <tr>
+            <td th:text = "${user.getUsername()}"></td>
+            <td th:text ="${user.getName()}"></td>
+            <td th:text ="${user.getLastName()}"></td>
+            <td th:text ="${user.getAge()}"></td>
       <!--  <td>
             <a th:href="@{users/edit(id = ${user.getId()})}">Редактировать пользователя</a>
         </td>

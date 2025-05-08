@@ -20,6 +20,15 @@
     <label for="age">Введите возраст: </label>
     <input type="text" th:field="*{age}" id="age">
     <br/>
+    <label for="roles">Выберите роли: </label>
+    <select multiple size="2" th:field="*{roles}" id="roles">
+        <option th:each="role : ${allRoles}"
+                th:value="${role.getId()}"
+                th:text="${role.getRole()}">
+
+        </option>
+    </select>
+    <br/>
 
     <input type="submit" value="Обновить пользователя">
 
