@@ -23,14 +23,14 @@ public class User implements UserDetails {
     @Column(name = "username")
     private String username;
 
-    @Column(name = "name")
-    private String name;
-
     @Column(name = "last_name")
     private String lastName;
 
     @Column(name = "age")
     private int age;
+
+    @Column(name = "email", unique = true)
+    private String email;
 
     @Column (name = "password")
     private String password;
@@ -46,14 +46,15 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String username, String name, String lastName, int age, String password, Set<Role> roles) {
+    public User(String username, String lastName, int age, String email, String password, Set<Role> roles) {
         this.username = username;
-        this.name = name;
         this.lastName = lastName;
         this.age = age;
+        this.email = email;
         this.password = password;
         this.roles = roles;
     }
+
 
     public Long getId() {
         return id;
@@ -63,12 +64,11 @@ public class User implements UserDetails {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getRealUsername() {
+        return username;
     }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getLastName() {
@@ -87,8 +87,12 @@ public class User implements UserDetails {
         this.age = age;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setPassword(String password) {
@@ -104,19 +108,6 @@ public class User implements UserDetails {
     }
 
     @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", name='" + name + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", age=" + age +
-                ", password='" + password + '\'' +
-                ", roles=" + roles +
-                '}';
-    }
-
-    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles;
     }
@@ -128,7 +119,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.username;
+        return this.email;
     }
 
     @Override

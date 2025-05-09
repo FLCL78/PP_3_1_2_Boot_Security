@@ -2,6 +2,7 @@ package ru.kata.spring.boot_security.demo.controllers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,8 @@ public class AdminController {
 
 
     @GetMapping()
-    public String index(Model model) {
+    public String index(Model model, @AuthenticationPrincipal User principal) {
+        model.addAttribute("user", principal);
         model.addAttribute("users", serviceBase.index());
         return "admin/admin";   //admin view
     }
