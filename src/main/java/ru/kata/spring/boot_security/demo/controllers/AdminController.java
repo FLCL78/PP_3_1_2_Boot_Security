@@ -34,6 +34,7 @@ public class AdminController {
     public String index(Model model, @AuthenticationPrincipal User principal) {
         model.addAttribute("user", principal);
         model.addAttribute("users", serviceBase.index());
+        model.addAttribute("allRoles", roleService.findAll());
         return "admin/admin";   //admin view
     }
 
@@ -57,7 +58,6 @@ public class AdminController {
     @GetMapping("/edit")
     public String edit(@RequestParam("id") Long id, Model model) {
         model.addAttribute("user", serviceBase.show(id));
-        model.addAttribute("allRoles", roleService.findAll());
         return "admin/edit";  //edit view
     }
     @PostMapping("/update")

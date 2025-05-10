@@ -9,6 +9,7 @@ import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -45,6 +46,10 @@ public class InitDataBase {
         userRepository.save(adminOnly);
         userRepository.save(user);
 
+    }
+    @PreDestroy
+    public void destroy() {
+        userRepository.deleteAll(userRepository.findAll());
     }
 
 }
