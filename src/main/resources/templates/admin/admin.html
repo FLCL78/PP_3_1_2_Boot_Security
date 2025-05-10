@@ -71,19 +71,19 @@
             padding: 60px 20px 20px;
         }
 
-        .all-user-heading {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            font-weight: bold;
-            border: 1px solid #dee2e6;
-            background-color: #eceeef;
+        .user-table-wrapper {
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-top: 1px;
         }
 
-        .table-container {
-            border: none;
-            border-radius: 0;
-            overflow: hidden;
-            background-color: white;
+        .user-table-header {
+            background-color: #f8f9fa;
+            padding: 12px 16px;
+            font-size: 1.25rem;
+            border-bottom: 1px solid #dee2e6;
 
         }
         .table th, .table td {
@@ -96,6 +96,32 @@
         }
         .table tbody tr:nth-child(even) {
             background-color: #f8f9fa;
+        }
+        .custom-tabs {
+            margin-bottom: 0;
+        }
+
+        .custom-tabs .nav-link {
+            border: 1px solid transparent;
+            border-radius: 0.25rem 0.25rem 0 0;
+            background-color: #e9ecef;
+            color: #495057;
+            transition: all 0.3s ease;
+            margin-right: 4px;
+        }
+
+        .custom-tabs .nav-link:hover {
+            background-color: #dee2e6;
+            border-color: #dee2e6 #dee2e6 #fff;
+        }
+
+        .custom-tabs .nav-link.active {
+            background-color: #fff;
+            border-color: #dee2e6 #dee2e6 #fff;
+            color: #000;
+            font-weight: 500;
+            position: relative;
+            z-index: 2;
         }
 
     </style>
@@ -130,19 +156,21 @@
 <!-- Админ-панелька с кнопка сверху таблицы -->
 <div class="main-content">
     <h1>Admin Panel</h1>
-    <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs custom-tabs">
         <li class="nav-item">
-            <a class="nav-link active" th:href="@{/admin}">Users table</a>
+            <a class="nav-link [[${#httpServletRequest.requestURI == '/admin'} ? 'active' : '']]" th:href="@{/admin}">Users table</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link active" th:href="@{/admin/new}">New user</a>
+            <a class="nav-link [[${#httpServletRequest.requestURI == '/admin/new'} ? 'active' : '']]" th:href="@{/admin/new}">New user</a>
         </li>
     </ul>
 
 
-    <h2 class="all-user-heading">All users</h2>
-    <div class="table-container">
-        <table class="table table-bordered">
+    <div class="user-table-wrapper">
+        <div class="user-table-header">
+            <strong>All users</strong>
+        </div>
+        <table class="table table-bordered mb-0">
         <thead>
         <tr>
             <th>ID</th>
@@ -162,8 +190,9 @@
             <td th:text="${user.getLastName()}"></td>
             <td th:text="${user.getAge}"></td>
             <td th:text="${user.getUsername()}"></td>
-            <td th:each="role : ${user.getRoles()}">
-                <span class="badge bg-info text-dark" th:text="${#strings.replace(role.getRole(), 'ROLE_', '')}"></span>
+            <td>
+                <span th:each="role, stat : ${user.getRoles()}"
+                      th:text="${#strings.replace(role.getRole(), 'ROLE_', '') + (stat.last ? '' : ', ')}"></span>
             </td>
             <td>
                 <a class="btn btn-primary btn-sm" th:href="@{/admin/edit(id=${user.getId()})}">Edit</a>

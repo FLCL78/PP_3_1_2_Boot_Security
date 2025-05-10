@@ -35,28 +35,16 @@ public class InitDataBase {
         Role roleUser = roleRepository.findByRole("ROLE_USER")
                 .orElseGet(() -> roleRepository.save(new Role("ROLE_USER")));
 
-        //Записали в базу
+        //Создали связь
         User adminUser = new User("Василий","Долговязый", 55, "admin@gmail.com", "admin", Set.of(roleAdmin, roleUser));
         User adminOnly = new User("Ахтубей", "Креплидзе", 22, "adminOnly@gmail.com", "adminOnly",Set.of(roleAdmin));
         User user = new User("User", "Userevich", 33, "user@gmail.com", "user", Set.of(roleUser));
 
+        //Записали в базу
         userRepository.save(adminUser);
         userRepository.save(adminOnly);
         userRepository.save(user);
 
     }
 
-    @PreDestroy
-    public void deleteFromBase() {
-        User admin = userRepository.findByEmail("admin@gmail.com").orElseThrow();
-        userRepository.delete(admin);
-
-        User adminOnly = userRepository.findByEmail("adminOnly@gmail.com").orElseThrow();
-        userRepository.delete(adminOnly);
-
-        User user = userRepository.findByEmail("user@gmail.com").orElseThrow();
-        userRepository.delete(user);
-
-
-    }
 }
