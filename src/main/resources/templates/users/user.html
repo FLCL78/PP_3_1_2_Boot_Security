@@ -9,20 +9,24 @@
 <table border="1">
     <thead>
     <tr>
+        <th>ID</th>
         <th>Никмейм</th>
         <th>Имя</th>
         <th>Фамилия</th>
         <th>Возраст</th>
+
 
     </tr>
     </thead>
 
     <tbody>
         <tr>
+            <td th:text="${user.getId()}"></td>
             <td th:text = "${user.getUsername()}"></td>
             <td th:text ="${user.getName()}"></td>
             <td th:text ="${user.getLastName()}"></td>
             <td th:text ="${user.getAge()}"></td>
+
       <!--  <td>
             <a th:href="@{users/edit(id = ${user.getId()})}">Редактировать пользователя</a>
         </td>

@@ -5,13 +5,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import ru.kata.spring.boot_security.demo.model.User;
-import ru.kata.spring.boot_security.demo.services.OurUserDetailsService;
-import ru.kata.spring.boot_security.demo.services.UserService;
-
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,10 +18,10 @@ import java.util.Set;
 @Component
 public class SuccessUserHandler implements AuthenticationSuccessHandler {
 
-    private final OurUserDetailsService userService;
+    private final UserDetailsService userService;
 
     @Autowired
-    public SuccessUserHandler(@Lazy OurUserDetailsService userService) {
+    public SuccessUserHandler(@Lazy UserDetailsService userService) {
         this.userService = userService;
     }
     @Override

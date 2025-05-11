@@ -20,6 +20,9 @@
     <label for="age">Введите возраст: </label>
     <input type="text" th:field="*{age}" id="age">
     <br/>
+    <label for="password">Введите пароль: </label>
+    <input type="password" th:field="*{password}" id="password">
+    <br/>
     <label>Выберите роли: </label>
     <select multiple size="2" th:field="*{roles}" id="roles">
         <option th:each="role : ${allRoles}"

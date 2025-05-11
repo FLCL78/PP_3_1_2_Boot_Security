@@ -7,7 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.model.User;
-import ru.kata.spring.boot_security.demo.services.ServiceBase;
+import ru.kata.spring.boot_security.demo.services.UserService;
 
 import java.nio.file.AccessDeniedException;
 
@@ -17,10 +17,10 @@ import java.nio.file.AccessDeniedException;
 public class UserController {
 
 
-    private final ServiceBase serviceBase;
+    private final UserService userService;
     @Autowired
-    public UserController(ServiceBase serviceBase) {
-        this.serviceBase = serviceBase;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/{id}")
@@ -35,7 +35,7 @@ public class UserController {
         if(!isAdmin && !currentUser.getId().equals(id)) {
             return "redirect:/user/" + currentUser.getId();
         }
-        model.addAttribute("user", serviceBase.show(id));
+        model.addAttribute("user", userService.show(id));
     return "users/user";
    }
 
