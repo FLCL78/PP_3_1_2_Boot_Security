@@ -190,76 +190,84 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="user : ${users}">
-                <td th:text="${user.getId()}">1</td>
-                <td th:text="${user.getRealUsername()}">Имя</td>
-                <td th:text="${user.getLastName()}">Фамилия</td>
-                <td th:text="${user.getAge()}">30</td>
-                <td th:text="${user.getUsername()}">email@mail.com</td>
+            <tr th:each="u : ${users}">
+                <td th:text="${u.id}">1</td>
+                <td th:text="${u.realUsername}">Имя</td>
+                <td th:text="${u.lastName}">Фамилия</td>
+                <td th:text="${u.age}">30</td>
+                <td th:text="${u.username}">email@mail.com</td>
                 <td>
-        <span th:each="role, stat : ${user.getRoles()}"
-              th:text="${#strings.replace(role.getRole(), 'ROLE_', '') + (stat.last ? '' : ', ')}"></span>
+        <span th:each="role, stat : ${u.roles}"
+              th:text="${#strings.replace(role.role, 'ROLE_', '') + (stat.last ? '' : ', ')}"></span>
                 </td>
                 <td>
                     <button type="button" class="btn btn-primary btn-sm"
-                            th:attr="data-bs-target='#editModal__' + ${user.id}"
+                            th:attr="data-bs-target='#editModal__' + ${u.id}"
                             data-bs-toggle="modal">
                         Edit
                     </button>
                 </td>
                 <td>
-                    <a class="btn btn-danger btn-sm" th:href="@{/admin/delete(id=${user.id})}">Delete</a>
+                    <a class="btn btn-danger btn-sm" th:href="@{/admin/delete(id=${u.id})}">Delete</a>
                 </td>
             </tr>
             </tbody>
+
         </table>
     </div>
 </div>
 
 <!-- Модальное окно Edit -->
-<div th:each="user : ${users}">
-    <div class="modal fade" th:id="'editModal__' + ${user.id}" tabindex="-1"
+<div th:each="u : ${users}">
+    <div class="modal fade" th:id="'editModal__' + ${u.id}" tabindex="-1"
          aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form th:method="post" th:action="@{/admin/update(id=${user.id})}" th:object="${user}">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit user</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
+                <form th:method="post" th:action="@{/admin/update(id=${u.id})}">
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label th:for="'username__' + ${user.id}" class="form-label">First name</label>
-                            <input type="text" th:field="*{username}" class="form-control"
-                                   th:id="'username__' + ${user.id}">
+                            <label class="form-label" th:for="'username__' + ${u.id}">First name</label>
+                            <input type="text" class="form-control"
+                                   th:value="${u.username}"
+                                   th:name="username"
+                                   th:id="'username__' + ${u.id}">
                         </div>
                         <div class="mb-3">
-                            <label th:for="'lastName__' + ${user.id}" class="form-label">Last name</label>
-                            <input type="text" th:field="*{lastName}" class="form-control"
-                                   th:id="'lastName__' + ${user.id}">
+                            <label class="form-label" th:for="'lastName__' + ${u.id}">Last name</label>
+                            <input type="text" class="form-control"
+                                   th:value="${u.lastName}"
+                                   th:name="lastName"
+                                   th:id="'lastName__' + ${u.id}">
                         </div>
                         <div class="mb-3">
-                            <label th:for="'age__' + ${user.id}" class="form-label">Age</label>
-                            <input type="text" th:field="*{age}" class="form-control"
-                                   th:id="'age__' + ${user.id}">
+                            <label class="form-label" th:for="'age__' + ${u.id}">Age</label>
+                            <input type="number" class="form-control"
+                                   th:value="${u.age}"
+                                   th:name="age"
+                                   th:id="'age__' + ${u.id}">
                         </div>
                         <div class="mb-3">
-                            <label th:for="'email__' + ${user.id}" class="form-label">Email</label>
-                            <input type="text" th:field="*{email}" class="form-control"
-                                   th:id="'email__' + ${user.id}">
+                            <label class="form-label" th:for="'email__' + ${u.id}">Email</label>
+                            <input type="text" class="form-control"
+                                   th:value="${u.username}"
+                                   th:name="email"
+                                   th:id="'email__' + ${u.id}">
                         </div>
                         <div class="mb-3">
-                            <label th:for="'password__' + ${user.id}" class="form-label">Password</label>
-                            <input type="password" th:field="*{password}" class="form-control"
-                                   th:id="'password__' + ${user.id}">
+                            <label class="form-label" th:for="'password__' + ${u.id}">Password</label>
+                            <input type="password" class="form-control"
+                                   th:name="password"
+                                   th:id="'password__' + ${u.id}">
                         </div>
                         <div class="mb-3">
-                            <label th:for="'roles__' + ${user.id}" class="form-label">Role</label>
-                            <select multiple size="2" class="form-select" th:field="*{roles}"
-                                    th:id="'roles__' + ${user.id}">
+                            <label class="form-label" th:for="'roles__' + ${u.id}">Role</label>
+                            <select multiple size="2" class="form-select"
+                                    th:name="roles"
+                                    th:id="'roles__' + ${u.id}">
                                 <option th:each="role : ${allRoles}"
                                         th:value="${role.id}"
-                                        th:text="${#strings.replace(role.role, 'ROLE_', '')}">
+                                        th:text="${#strings.replace(role.role, 'ROLE_', '')}"
+                                        th:selected="${u.roles.contains(role)}">
                                 </option>
                             </select>
                         </div>
@@ -269,10 +277,12 @@
                         <button type="submit" class="btn btn-primary">Edit</button>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
 </div>
+
 
 
 
