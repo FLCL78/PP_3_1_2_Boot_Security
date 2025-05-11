@@ -3,15 +3,15 @@ package ru.kata.spring.boot_security.demo.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.services.RoleService;
-import ru.kata.spring.boot_security.demo.services.ServiceBase;
+import ru.kata.spring.boot_security.demo.services.UserService;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,19 +21,22 @@ import java.util.stream.Collectors;
 public class AdminController {
 
 
-    private final ServiceBase serviceBase;
+    private final UserService userService;
     private final RoleService roleService;
+    private final BCryptPasswordEncoder passwordEncoder;
+
     @Autowired
-    public AdminController(ServiceBase serviceBase, RoleService roleService) {
-        this.serviceBase = serviceBase;
+    public AdminController(UserService userService, RoleService roleService, BCryptPasswordEncoder passwordEncoder) {
+        this.userService = userService;
         this.roleService = roleService;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
     @GetMapping()
     public String index(Model model, @AuthenticationPrincipal User principal) {
         model.addAttribute("user", principal);
-        model.addAttribute("users", serviceBase.index());
+        model.addAttribute("users", userService.index());
         model.addAttribute("allRoles", roleService.findAll());
         return "admin/admin";   //admin view
     }
@@ -51,13 +54,14 @@ public class AdminController {
                 .map(role -> roleService.findById(role.getId()))
                 .collect(Collectors.toSet());
         user.setRoles(selectedRoles);
-        serviceBase.save(user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userService.save(user);
         return "redirect:/admin";
     }
 
     @GetMapping("/edit")
     public String edit(@RequestParam("id") Long id, Model model) {
-        model.addAttribute("user", serviceBase.show(id));
+        model.addAttribute("user", userService.show(id));
         return "admin/edit";  //edit view
     }
     @PostMapping("/update")
@@ -66,13 +70,14 @@ public class AdminController {
                 .map(role -> roleService.findById(role.getId()))
                 .collect(Collectors.toSet());
         user.setRoles(selectedRoles);
-        serviceBase.update(id, user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userService.update(id, user);
         return "redirect:/admin"; //функционал изменения, сначала правим в модель выше, затем обновляем объект.
     }
 
     @GetMapping("/delete")
     public String delete(@RequestParam("id") Long id) {
-        serviceBase.delete(id);
+        userService.delete(id);
         return "redirect:/admin";
     }
 

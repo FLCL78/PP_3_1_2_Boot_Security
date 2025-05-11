@@ -2,6 +2,7 @@ package ru.kata.spring.boot_security.demo.initDataBase;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import ru.kata.spring.boot_security.demo.dao.RoleRepository;
 import ru.kata.spring.boot_security.demo.dao.UserRepository;
@@ -21,11 +22,13 @@ public class InitDataBase {
 
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public InitDataBase(RoleRepository roleRepository, UserRepository userRepository) {
+    public InitDataBase(RoleRepository roleRepository, UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostConstruct
@@ -40,6 +43,11 @@ public class InitDataBase {
         User adminUser = new User("Василий","Долговязый", 55, "admin@gmail.com", "admin", Set.of(roleAdmin, roleUser));
         User adminOnly = new User("Ахтубей", "Креплидзе", 22, "adminOnly@gmail.com", "adminOnly",Set.of(roleAdmin));
         User user = new User("User", "Userevich", 33, "user@gmail.com", "user", Set.of(roleUser));
+
+        // Закодировали парольчики
+        adminUser.setPassword(passwordEncoder.encode(adminUser.getPassword()));
+        adminOnly.setPassword(passwordEncoder.encode(adminOnly.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         //Записали в базу
         userRepository.save(adminUser);
