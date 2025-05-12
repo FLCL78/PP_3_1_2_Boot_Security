@@ -38,6 +38,7 @@ public class AdminController {
         model.addAttribute("user", principal);
         model.addAttribute("users", userService.index());
         model.addAttribute("allRoles", roleService.findAll());
+        model.addAttribute("newUser", new User());
         return "admin/admin";   //admin view
     }
 
@@ -49,7 +50,7 @@ public class AdminController {
     }
 
     @PostMapping("/new")
-    public String save(@ModelAttribute("user") User user) {
+    public String save(@ModelAttribute("newUser") User user) {
         Set<Role> selectedRoles = user.getRoles().stream()
                 .map(role -> roleService.findById(role.getId()))
                 .collect(Collectors.toSet());
@@ -80,7 +81,7 @@ public class AdminController {
         return "redirect:/admin"; //функционал изменения, сначала правим в модель выше, затем обновляем объект.
         }
 
-    @GetMapping("/delete")
+    @PostMapping("/delete")
     public String delete(@RequestParam("id") Long id) {
         userService.delete(id);
         return "redirect:/admin";

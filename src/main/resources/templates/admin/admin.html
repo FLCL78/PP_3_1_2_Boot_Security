@@ -142,6 +142,50 @@
             margin: 0 auto; /* центровка, если нужна */
         }
 
+        .user-new-wrapper {
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-top: 1px;
+        }
+
+        .user-new-header {
+            background-color: #f8f9fa;
+            padding: 12px 16px;
+            font-size: 1.25rem;
+            border-bottom: 1px solid #dee2e6;
+            margin-top: -1px; /* Убирает зазор между табами и контейнером */
+            border-top: 1px solid #dee2e6; /* визуально объединяет с табами */
+
+        }
+        .form-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px 0 40px;
+        }
+
+        .form-label {
+            font-weight: bold;
+            display: block;
+            text-align: center;
+        }
+
+        .form-control:focus {
+            background-color: #fff9cc;
+            border-color: #ffc107;
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+        }
+
+        .form-select:focus {
+            background-color: #fff9cc;
+            border-color: #ffc107;
+            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+        }
+        .tab-content {
+            margin-top: 0 !important;
+        }
+
     </style>
 </head>
 <body>
@@ -176,16 +220,15 @@
     <h1>Admin Panel</h1>
     <ul class="nav nav-tabs custom-tabs">
         <li class="nav-item">
-            <a class="nav-link [[${#httpServletRequest.requestURI == '/admin'} ? 'active' : '']]" th:href="@{/admin}">Users
-                table</a>
+            <a class="nav-link active" data-bs-toggle="tab" href="#users">Users table</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link [[${#httpServletRequest.requestURI == '/admin/new'} ? 'active' : '']]"
-               th:href="@{/admin/new}">New user</a>
+            <a class="nav-link" data-bs-toggle="tab" href="#new-user">New user</a>
         </li>
     </ul>
 
-
+    <div class="tab-content" style="margin-top: 0">
+        <div class="tab-pane fade show active" id="users">
     <div class="user-table-wrapper">
         <div class="user-table-header">
             <strong>All users</strong>
@@ -234,6 +277,59 @@
         </table>
     </div>
 </div>
+<div class="tab-pane fade" id="new-user">
+    <div class="user-new-wrapper">
+        <div class="user-new-header">
+            <strong>Add new user</strong>
+        </div>
+        <!-- форма добавления нового пользователя -->
+        <div class="form-container">
+            <form th:action="@{/admin/new}" method="post" th:object="${newUser}">
+                <div class="mb-3">
+                    <label class="form-label" th:for="realUsername">First name</label>
+                    <input type="text" class="form-control"
+                           th:field="*{realUsername}" id="realUsername">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" th:for="lastName">Last name</label>
+                    <input type="text" class="form-control"
+                           th:field="*{lastName}" id="lastName">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="age">Age</label>
+                    <input type="number" class="form-control"
+                           th:field="*{age}" id="age">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" th:for="email">Email</label>
+                    <input type="text" class="form-control"
+                           th:field="*{email}" id="email">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" class="form-control"
+                           th:field="*{password}" id="password">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" th:for="roles">Role</label>
+                    <select multiple size="2" class="form-select"
+                            th:field="*{roles}" id="roles">
+                        <option th:each="role : ${allRoles}"
+                                th:value="${role.id}"
+                                th:text="${#strings.replace(role.role, 'ROLE_', '')}">
+                        </option>
+                    </select>
+                </div>
+                <div class="text-center mt-3">
+                <button type="submit" class="btn btn-success">Add new user</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+
 
 <!-- Модальное окно Edit -->
 <div th:each="u : ${users}">
@@ -256,11 +352,11 @@
                                    th:id="'id__' + ${u.id}" readonly>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" th:for="'username__' + ${u.id}">First name</label>
+                            <label class="form-label" th:for="'realUsername__' + ${u.id}">First name</label>
                             <input type="text" class="form-control"
                                    th:value="${u.realUsername}"
-                                   th:name="username"
-                                   th:id="'username__' + ${u.id}">
+                                   th:name="realUsername"
+                                   th:id="'realUsername__' + ${u.id}">
                         </div>
                         <div class="mb-3">
                             <label class="form-label" th:for="'lastName__' + ${u.id}">Last name</label>
@@ -334,11 +430,11 @@
                                    th:id="'id__' + ${u.id}" readonly>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" th:for="'username__' + ${u.id}">First name</label>
+                            <label class="form-label" th:for="'realUsername__' + ${u.id}">First name</label>
                             <input type="text" class="form-control"
                                    th:value="${u.realUsername}"
-                                   th:name="username"
-                                   th:id="'username__' + ${u.id}"  readonly>
+                                   th:name="realUsername"
+                                   th:id="'realUsername__' + ${u.id}"  readonly>
                         </div>
                         <div class="mb-3">
                             <label class="form-label" th:for="'lastName__' + ${u.id}">Last name</label>
@@ -376,7 +472,7 @@
                     </div>
                     <div class="modal-footer">
                         <a class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
-                        <button type="submit" class="btn btn-danger">Edit</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
                     </div>
                 </form>
 

@@ -21,7 +21,7 @@ public class User implements UserDetails {
     private Long id;
 
     @Column(name = "username")
-    private String username;
+    private String realUsername;
 
     @Column(name = "last_name")
     private String lastName;
@@ -46,8 +46,8 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String username, String lastName, int age, String email, String password, Set<Role> roles) {
-        this.username = username;
+    public User(String realUsername, String lastName, int age, String email, String password, Set<Role> roles) {
+        this.realUsername = realUsername;
         this.lastName = lastName;
         this.age = age;
         this.email = email;
@@ -65,10 +65,10 @@ public class User implements UserDetails {
     }
 
     public String getRealUsername() {
-        return username;
+        return realUsername;
     }
-    public void setUsername(String username) {
-        this.username = username;
+    public void setRealUsername(String realUsername) {
+        this.realUsername = realUsername;
     }
 
     public String getLastName() {
