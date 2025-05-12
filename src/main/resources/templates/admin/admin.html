@@ -26,7 +26,6 @@
             left: 0;
             z-index: 1000;
             border-bottom: 1px solid #495057;
-            padding-left: 20px;
         }
 
         .user-info .logout {
@@ -128,63 +127,6 @@
             position: relative;
             z-index: 2;
         }
-        /* Жирный текст для полей форм */
-        .modal-body label {
-            font-weight: bold;
-            text-align: center;
-            display: block;
-        }
-
-        /* Сужение полей формы */
-        .modal-body .form-control,
-        .modal-body select {
-            max-width: 250px; /* регулируй это значение по желанию */
-            margin: 0 auto; /* центровка, если нужна */
-        }
-
-        .user-new-wrapper {
-            background-color: white;
-            border-radius: 6px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-            margin-top: 1px;
-        }
-
-        .user-new-header {
-            background-color: #f8f9fa;
-            padding: 12px 16px;
-            font-size: 1.25rem;
-            border-bottom: 1px solid #dee2e6;
-            margin-top: -1px; /* Убирает зазор между табами и контейнером */
-            border-top: 1px solid #dee2e6; /* визуально объединяет с табами */
-
-        }
-        .form-container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px 0 40px;
-        }
-
-        .form-label {
-            font-weight: bold;
-            display: block;
-            text-align: center;
-        }
-
-        .form-control:focus {
-            background-color: #fff9cc;
-            border-color: #ffc107;
-            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
-        }
-
-        .form-select:focus {
-            background-color: #fff9cc;
-            border-color: #ffc107;
-            box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
-        }
-        .tab-content {
-            margin-top: 0 !important;
-        }
 
     </style>
 </head>
@@ -212,7 +154,7 @@
 
 <div class="sidebar">
     <a class="active" th:href="@{/admin}">Admin</a>
-    <a th:href="@{'/user/' + ${user.id}}">User</a>
+    <a th:href="@{/user}">User</a>
 </div>
 
 <!-- Админ-панелька с кнопка сверху таблицы -->
@@ -220,15 +162,16 @@
     <h1>Admin Panel</h1>
     <ul class="nav nav-tabs custom-tabs">
         <li class="nav-item">
-            <a class="nav-link active" data-bs-toggle="tab" href="#users">Users table</a>
+            <a class="nav-link [[${#httpServletRequest.requestURI == '/admin'} ? 'active' : '']]" th:href="@{/admin}">Users
+                table</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#new-user">New user</a>
+            <a class="nav-link [[${#httpServletRequest.requestURI == '/admin/new'} ? 'active' : '']]"
+               th:href="@{/admin/new}">New user</a>
         </li>
     </ul>
 
-    <div class="tab-content" style="margin-top: 0">
-        <div class="tab-pane fade show active" id="users">
+
     <div class="user-table-wrapper">
         <div class="user-table-header">
             <strong>All users</strong>
@@ -258,16 +201,23 @@
               th:text="${#strings.replace(role.role, 'ROLE_', '') + (stat.last ? '' : ', ')}"></span>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-primary btn-sm"
+                    <button type="button"
+                            class="btn btn-primary btn-sm"
                             th:attr="data-bs-target='#editModal__' + ${u.id}"
                             data-bs-toggle="modal">
                         Edit
                     </button>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-danger btn-sm"
-                            th:attr="data-bs-target='#deleteModal__' + ${u.id}"
-                            data-bs-toggle="modal">
+                    <button type="button"
+                            class="btn btn-danger btn-sm"
+                            th:attr="data-user-id=${u.id},
+                            data-user-name=${u.realUsername},
+                            data-user-lastname=${u.lastName},
+                            data-user-age=${u.age},
+                            data-user-email=${u.username},
+                             data-user-roleids=${#strings.arrayJoin(u.roles.?[#this != null].![id], ',')}"
+                            onclick="openDeleteModal(this)">
                         Delete
                     </button>
                 </td>
@@ -277,59 +227,6 @@
         </table>
     </div>
 </div>
-<div class="tab-pane fade" id="new-user">
-    <div class="user-new-wrapper">
-        <div class="user-new-header">
-            <strong>Add new user</strong>
-        </div>
-        <!-- форма добавления нового пользователя -->
-        <div class="form-container">
-            <form th:action="@{/admin/new}" method="post" th:object="${newUser}">
-                <div class="mb-3">
-                    <label class="form-label" th:for="realUsername">First name</label>
-                    <input type="text" class="form-control"
-                           th:field="*{realUsername}" id="realUsername">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" th:for="lastName">Last name</label>
-                    <input type="text" class="form-control"
-                           th:field="*{lastName}" id="lastName">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="age">Age</label>
-                    <input type="number" class="form-control"
-                           th:field="*{age}" id="age">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" th:for="email">Email</label>
-                    <input type="text" class="form-control"
-                           th:field="*{email}" id="email">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" for="password">Password</label>
-                    <input type="password" class="form-control"
-                           th:field="*{password}" id="password">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label" th:for="roles">Role</label>
-                    <select multiple size="2" class="form-select"
-                            th:field="*{roles}" id="roles">
-                        <option th:each="role : ${allRoles}"
-                                th:value="${role.id}"
-                                th:text="${#strings.replace(role.role, 'ROLE_', '')}">
-                        </option>
-                    </select>
-                </div>
-                <div class="text-center mt-3">
-                <button type="submit" class="btn btn-success">Add new user</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-    </div>
-</div>
-
 
 <!-- Модальное окно Edit -->
 <div th:each="u : ${users}">
@@ -337,26 +234,14 @@
          aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Edit User</h5>
-                    <!-- Вот этот крестик закрытия -->
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
                 <form th:method="post" th:action="@{/admin/update(id=${u.id})}">
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label" th:for="'id__' + ${u.id}">ID</label>
+                            <label class="form-label" th:for="'username__' + ${u.id}">First name</label>
                             <input type="text" class="form-control"
-                                   th:value="${u.id}"
-                                   th:name="id"
-                                   th:id="'id__' + ${u.id}" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" th:for="'realUsername__' + ${u.id}">First name</label>
-                            <input type="text" class="form-control"
-                                   th:value="${u.realUsername}"
-                                   th:name="realUsername"
-                                   th:id="'realUsername__' + ${u.id}">
+                                   th:value="${u.username}"
+                                   th:name="username"
+                                   th:id="'username__' + ${u.id}">
                         </div>
                         <div class="mb-3">
                             <label class="form-label" th:for="'lastName__' + ${u.id}">Last name</label>
@@ -399,95 +284,116 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <a class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+                        <a class="btn btn-secondary" data-bs-dismiss="modal">Close</a>
                         <button type="submit" class="btn btn-primary">Edit</button>
                     </div>
                 </form>
-
             </div>
         </div>
     </div>
 </div>
 
-<!-- Модальное окно delete -->
-<div th:each="u : ${users}">
-    <div class="modal fade" th:id="'deleteModal__' + ${u.id}" tabindex="-1"
-         aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
+<!-- Модальное окно удаления -->
+
+<div class="modal fade" id="deleteModal" tabindex="-1"
+     aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="deleteForm" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Delete User</h5>
-                    <!-- Вот этот крестик закрытия -->
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">Confirm deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="close"></button>
                 </div>
-                <form th:method="post" th:action="@{/admin/delete(id=${u.id})}">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label" th:for="'id__' + ${u.id}">ID</label>
-                            <input type="text" class="form-control"
-                                   th:value="${u.id}"
-                                   th:name="id"
-                                   th:id="'id__' + ${u.id}" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" th:for="'realUsername__' + ${u.id}">First name</label>
-                            <input type="text" class="form-control"
-                                   th:value="${u.realUsername}"
-                                   th:name="realUsername"
-                                   th:id="'realUsername__' + ${u.id}"  readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" th:for="'lastName__' + ${u.id}">Last name</label>
-                            <input type="text" class="form-control"
-                                   th:value="${u.lastName}"
-                                   th:name="lastName"
-                                   th:id="'lastName__' + ${u.id}"  readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" th:for="'age__' + ${u.id}">Age</label>
-                            <input type="number" class="form-control"
-                                   th:value="${u.age}"
-                                   th:name="age"
-                                   th:id="'age__' + ${u.id}"  readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" th:for="'email__' + ${u.id}">Email</label>
-                            <input type="text" class="form-control"
-                                   th:value="${u.username}"
-                                   th:name="email"
-                                   th:id="'email__' + ${u.id}"  readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" th:for="'roles__' + ${u.id}">Role</label>
-                            <select multiple size="2" class="form-select"
-                                    th:name="roles"
-                                    th:id="'roles__' + ${u.id}">
-                                <option th:each="role : ${allRoles}"
-                                        th:value="${role.id}"
-                                        th:text="${#strings.replace(role.role, 'ROLE_', '')}"
-                                        th:selected="${u.roles.contains(role)}" disabled >
-                                </option>
-                            </select>
-                        </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">ID</label>
+                        <input type="text" class="form-control" id="deleteId" disabled>
                     </div>
-                    <div class="modal-footer">
-                        <a class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
-                        <button type="submit" class="btn btn-danger">Delete</button>
+                    <div class="mb-3">
+                        <label class="form-label">First name</label>
+                        <input type="text" class="form-control" id="deleteFirstName" disabled>
                     </div>
-                </form>
-
-            </div>
+                    <div class="mb-3">
+                        <label class="form-label">Last name</label>
+                        <input type="text" class="form-control" id="deleteLastName" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Age</label>
+                        <input type="number" class="form-control" id="deleteAge" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="text" class="form-control" id="deleteEmail" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Roles</label>
+                        <select class="form-select" id="deleteRoles" multiple disabled></select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-
-
-
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
+
+<script>
+    /* Для модалки удаления */
+    // Массив для ролей
+    const allRoles = [
+        // Эти значения нужно вставить вручную, можно через th, но уже T_T
+        {id: 1, name: 'ADMIN'},
+        {id: 2, name: 'USER'}
+    ];
+    function openDeleteModal(button) {
+        const userId = button.getAttribute('data-user-id');
+        const userName = button.getAttribute('data-user-name');
+        const userLastName = button.getAttribute('data-user-lastname');
+        const userAge = button.getAttribute('data-user-age');
+        const userEmail = button.getAttribute('data-user-email');
+        const userRoleIds = button.getAttribute('data-user-roleids');
+
+        // Заполняем выпадающий список ролей
+        const rolesSelect = document.getElementById('deleteRoles');
+        rolesSelect.innerHTML = '';
+        const selectedIds = userRoleIds ? userRoleIds.split(',') : [];
+
+        allRoles.forEach(role => {
+            const option = document.createElement('option');
+            option.value = role.id;
+            option.text = role.name;
+            if (selectedIds.includes(String(role.id))) {
+                option.selected = true;
+            }
+            rolesSelect.appendChild(option);
+        });
+
+        document.getElementById('deleteId').value = userId;
+        document.getElementById('deleteFirstName').value = userName;
+        document.getElementById('deleteLastName').value = userLastName;
+        document.getElementById('deleteAge').value = userAge;
+        document.getElementById('deleteEmail').value = userEmail;
+
+
+        const form = document.getElementById('deleteForm');
+        form.setAttribute('action', `/admin/delete?id=${userId}`);
+
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        deleteModal.show();
+    }
+
+    /* Для модалки edit */
+
+
+</script>
 
 
 </body>
