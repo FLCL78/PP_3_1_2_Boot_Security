@@ -70,7 +70,12 @@ public class AdminController {
                 .map(role -> roleService.findById(role.getId()))
                 .collect(Collectors.toSet());
         user.setRoles(selectedRoles);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User existUser = userService.show(id);
+        if(user.getPassword() == null || user.getPassword().isBlank()) {
+            user.setPassword(existUser.getPassword());
+        } else {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         userService.update(id, user);
         return "redirect:/admin"; //функционал изменения, сначала правим в модель выше, затем обновляем объект.
     }
