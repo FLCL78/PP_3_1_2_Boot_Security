@@ -38,19 +38,18 @@ public class AdminController {
         model.addAttribute("user", principal);
         model.addAttribute("users", userService.index());
         model.addAttribute("allRoles", roleService.findAll());
-        model.addAttribute("newUser", new User());
         return "admin/admin";   //admin view
     }
 
-    @GetMapping("/new")
-    public String newUser(Model model) {
-        model.addAttribute("user", new User());
-        model.addAttribute("allRoles", roleService.findAll());
-        return "admin/user_form";
-    }
+//    @GetMapping("/new")
+//    public String newUser(Model model) {
+//        model.addAttribute("user", new User());
+//        model.addAttribute("allRoles", roleService.findAll());
+//        return "admin/user_form";
+//    }
 
     @PostMapping("/new")
-    public String save(@ModelAttribute("newUser") User user) {
+    public String save(@ModelAttribute("user") User user) {
         Set<Role> selectedRoles = user.getRoles().stream()
                 .map(role -> roleService.findById(role.getId()))
                 .collect(Collectors.toSet());
@@ -60,11 +59,11 @@ public class AdminController {
         return "redirect:/admin#users";
     }
 
-    @GetMapping("/edit")
-    public String edit(@RequestParam("id") Long id, Model model) {
-        model.addAttribute("user", userService.show(id));
-        return "admin/edit";  //edit view
-    }
+//    @GetMapping("/edit")
+//    public String edit(@RequestParam("id") Long id, Model model) {
+//        model.addAttribute("user", userService.show(id));
+//        return "admin/edit";  //edit view
+//    }
     @PostMapping("/update")
     public String update(@RequestParam("id") Long id, @ModelAttribute("user") User user) {
         Set<Role> selectedRoles = user.getRoles().stream()
@@ -79,7 +78,7 @@ public class AdminController {
         }
         userService.update(id, user);
         return "redirect:/admin"; //функционал изменения, сначала правим в модель выше, затем обновляем объект.
-        }
+    }
 
     @PostMapping("/delete")
     public String delete(@RequestParam("id") Long id) {
