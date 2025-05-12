@@ -41,14 +41,14 @@ public class AdminController {
         return "admin/admin";   //admin view
     }
 
-    @GetMapping("/new")
-    public String newUser(Model model) {
-        model.addAttribute("user", new User());
-        model.addAttribute("allRoles", roleService.findAll());
-        return "admin/user_form";
-    }
+//    @GetMapping("/new")
+//    public String newUser(Model model) {
+//        model.addAttribute("user", new User());
+//        model.addAttribute("allRoles", roleService.findAll());
+//        return "admin/user_form";
+//    }
 
-    @PostMapping()
+    @PostMapping("/new")
     public String save(@ModelAttribute("user") User user) {
         Set<Role> selectedRoles = user.getRoles().stream()
                 .map(role -> roleService.findById(role.getId()))
@@ -56,14 +56,14 @@ public class AdminController {
         user.setRoles(selectedRoles);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.save(user);
-        return "redirect:/admin";
+        return "redirect:/admin#users";
     }
 
-    @GetMapping("/edit")
-    public String edit(@RequestParam("id") Long id, Model model) {
-        model.addAttribute("user", userService.show(id));
-        return "admin/edit";  //edit view
-    }
+//    @GetMapping("/edit")
+//    public String edit(@RequestParam("id") Long id, Model model) {
+//        model.addAttribute("user", userService.show(id));
+//        return "admin/edit";  //edit view
+//    }
     @PostMapping("/update")
     public String update(@RequestParam("id") Long id, @ModelAttribute("user") User user) {
         Set<Role> selectedRoles = user.getRoles().stream()
