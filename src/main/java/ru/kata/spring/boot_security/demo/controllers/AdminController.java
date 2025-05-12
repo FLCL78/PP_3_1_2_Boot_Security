@@ -75,7 +75,7 @@ public class AdminController {
         return "redirect:/admin"; //функционал изменения, сначала правим в модель выше, затем обновляем объект.
     }
 
-    @GetMapping("/delete")
+    @PostMapping("/delete")
     public String delete(@RequestParam("id") Long id) {
         userService.delete(id);
         return "redirect:/admin";
