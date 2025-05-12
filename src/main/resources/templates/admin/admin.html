@@ -26,6 +26,7 @@
             left: 0;
             z-index: 1000;
             border-bottom: 1px solid #495057;
+            padding-left: 20px;
         }
 
         .user-info .logout {
@@ -127,6 +128,19 @@
             position: relative;
             z-index: 2;
         }
+        /* Жирный текст для полей форм */
+        .modal-body label {
+            font-weight: bold;
+            text-align: center;
+            display: block;
+        }
+
+        /* Сужение полей формы */
+        .modal-body .form-control,
+        .modal-body select {
+            max-width: 250px; /* регулируй это значение по желанию */
+            margin: 0 auto; /* центровка, если нужна */
+        }
 
     </style>
 </head>
@@ -208,7 +222,11 @@
                     </button>
                 </td>
                 <td>
-                    <a class="btn btn-danger btn-sm" th:href="@{/admin/delete(id=${u.id})}">Delete</a>
+                    <button type="button" class="btn btn-danger btn-sm"
+                            th:attr="data-bs-target='#deleteModal__' + ${u.id}"
+                            data-bs-toggle="modal">
+                        Delete
+                    </button>
                 </td>
             </tr>
             </tbody>
@@ -223,12 +241,24 @@
          aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit User</h5>
+                    <!-- Вот этот крестик закрытия -->
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
                 <form th:method="post" th:action="@{/admin/update(id=${u.id})}">
                     <div class="modal-body">
                         <div class="mb-3">
+                            <label class="form-label" th:for="'id__' + ${u.id}">ID</label>
+                            <input type="text" class="form-control"
+                                   th:value="${u.id}"
+                                   th:name="id"
+                                   th:id="'id__' + ${u.id}" readonly>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label" th:for="'username__' + ${u.id}">First name</label>
                             <input type="text" class="form-control"
-                                   th:value="${u.username}"
+                                   th:value="${u.realUsername}"
                                    th:name="username"
                                    th:id="'username__' + ${u.id}">
                         </div>
@@ -273,7 +303,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <a class="btn btn-secondary" data-bs-dismiss="modal">Close</a>
+                        <a class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
                         <button type="submit" class="btn btn-primary">Edit</button>
                     </div>
                 </form>
@@ -282,6 +312,79 @@
         </div>
     </div>
 </div>
+
+<!-- Модальное окно delete -->
+<div th:each="u : ${users}">
+    <div class="modal fade" th:id="'deleteModal__' + ${u.id}" tabindex="-1"
+         aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Delete User</h5>
+                    <!-- Вот этот крестик закрытия -->
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:method="post" th:action="@{/admin/delete(id=${u.id})}">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label" th:for="'id__' + ${u.id}">ID</label>
+                            <input type="text" class="form-control"
+                                   th:value="${u.id}"
+                                   th:name="id"
+                                   th:id="'id__' + ${u.id}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" th:for="'username__' + ${u.id}">First name</label>
+                            <input type="text" class="form-control"
+                                   th:value="${u.realUsername}"
+                                   th:name="username"
+                                   th:id="'username__' + ${u.id}"  readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" th:for="'lastName__' + ${u.id}">Last name</label>
+                            <input type="text" class="form-control"
+                                   th:value="${u.lastName}"
+                                   th:name="lastName"
+                                   th:id="'lastName__' + ${u.id}"  readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" th:for="'age__' + ${u.id}">Age</label>
+                            <input type="number" class="form-control"
+                                   th:value="${u.age}"
+                                   th:name="age"
+                                   th:id="'age__' + ${u.id}"  readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" th:for="'email__' + ${u.id}">Email</label>
+                            <input type="text" class="form-control"
+                                   th:value="${u.username}"
+                                   th:name="email"
+                                   th:id="'email__' + ${u.id}"  readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" th:for="'roles__' + ${u.id}">Role</label>
+                            <select multiple size="2" class="form-select"
+                                    th:name="roles"
+                                    th:id="'roles__' + ${u.id}">
+                                <option th:each="role : ${allRoles}"
+                                        th:value="${role.id}"
+                                        th:text="${#strings.replace(role.role, 'ROLE_', '')}"
+                                        th:selected="${u.roles.contains(role)}" disabled >
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
+                        <button type="submit" class="btn btn-danger">Edit</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 

@@ -48,7 +48,7 @@ public class AdminController {
         return "admin/user_form";
     }
 
-    @PostMapping()
+    @PostMapping("/new")
     public String save(@ModelAttribute("user") User user) {
         Set<Role> selectedRoles = user.getRoles().stream()
                 .map(role -> roleService.findById(role.getId()))
@@ -56,7 +56,7 @@ public class AdminController {
         user.setRoles(selectedRoles);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.save(user);
-        return "redirect:/admin";
+        return "redirect:/admin#users";
     }
 
     @GetMapping("/edit")
@@ -70,10 +70,15 @@ public class AdminController {
                 .map(role -> roleService.findById(role.getId()))
                 .collect(Collectors.toSet());
         user.setRoles(selectedRoles);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User existUser = userService.show(id);
+        if(user.getPassword() == null || user.getPassword().isBlank()) {
+            user.setPassword(existUser.getPassword());
+        } else {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         userService.update(id, user);
         return "redirect:/admin"; //функционал изменения, сначала правим в модель выше, затем обновляем объект.
-    }
+        }
 
     @GetMapping("/delete")
     public String delete(@RequestParam("id") Long id) {
