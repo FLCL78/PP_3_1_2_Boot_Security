@@ -154,7 +154,7 @@
 
 <div class="sidebar">
     <a class="active" th:href="@{/admin}">Admin</a>
-    <a th:href="@{/user}">User</a>
+    <a th:href="@{'/user/' + ${user.id}}">User</a>
 </div>
 
 <!-- Админ-панелька с кнопка сверху таблицы -->
