@@ -26,6 +26,7 @@
             left: 0;
             z-index: 1000;
             border-bottom: 1px solid #495057;
+            padding-left: 20px;
         }
 
         .user-info .logout {
@@ -197,7 +198,7 @@
 
 <div class="sidebar">
     <a class="active" th:href="@{/admin}">Admin</a>
-    <a th:href="@{/user}">User</a>
+    <a th:href="@{'/user/' + ${user.id}}">User</a>
 </div>
 
 <!-- Админ-панелька с кнопка сверху таблицы -->
