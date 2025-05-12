@@ -428,12 +428,12 @@
 <script>
     // Массив для ролей
     const allRoles = [
-        // Эти значения нужно вставить вручную, можно через th, но уже T_T
+        //можно через th, но уже T_T
         {id: 1, name: 'ADMIN'},
         {id: 2, name: 'USER'}
     ];
     /* Для модалки удаления */
-    // Массив для ролей
+
 
     function openDeleteModal(button) {
         const userId = button.getAttribute('data-user-id');
@@ -480,7 +480,6 @@
         const userLastName = button.getAttribute('data-user-lastname');
         const userAge = button.getAttribute('data-user-age');
         const userEmail = button.getAttribute('data-user-email');
-        const userPassword = button.getAttribute('data-user-password');
         const userRoleIds = button.getAttribute('data-user-roleids');
 
         // Заполняем выпадающий список ролей
