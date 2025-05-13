@@ -2,6 +2,7 @@ package ru.kata.spring.boot_security.demo.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.dao.RoleRepository;
 import ru.kata.spring.boot_security.demo.model.Role;
@@ -9,7 +10,7 @@ import ru.kata.spring.boot_security.demo.model.Role;
 import java.util.List;
 import java.util.Optional;
 
-@Component
+@Service
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
