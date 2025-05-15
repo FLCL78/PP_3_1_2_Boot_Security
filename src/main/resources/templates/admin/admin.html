@@ -382,142 +382,152 @@
         crossorigin="anonymous"></script>
 
 <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+        const allRoles = [];
 
-    const allRoles = [];
-
-    async function fetchRoles() {
-        const res = await fetch('/api/admin/roles');
-        const data = await res.json();
-        allRoles.length = 0;
-        data.forEach(r => allRoles.push(r));
-    }
-
-    async function fillRoleSelect(id, selected = [], disabled = false) {
-        await fetchRoles();
-        const sel = document.getElementById(id);
-        sel.innerHTML = '';
-        allRoles.forEach(r => {
-            const opt = document.createElement('option');
-            opt.value = r.id;
-            opt.text = r.role.replace('ROLE_', '');
-            opt.selected = selected.includes(r.id);
-            opt.disabled = disabled;
-            sel.appendChild(opt);
-        });
-    }
-
-    async function fetchUsers() {
-        const res = await fetch('/api/admin/users');
-        const users = await res.json();
-        const tbody = document.querySelector("#users-info-body");
-        tbody.innerHTML = '';
-        users.forEach(user => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${user.id}</td>
-                <td>${user.realUsername}</td>
-                <td>${user.lastName}</td>
-                <td>${user.age}</td>
-                <td>${user.email}</td>
-                <td>${user.roles.map(r => r.role.replace('ROLE_', '')).join(', ')}</td>
-                <td><button class='btn btn-primary btn-sm btn-edit'>Edit</button></td>
-                <td><button class='btn btn-danger btn-sm btn-delete'>Delete</button></td>`;
-            tbody.appendChild(tr);
-            const editBtn = tr.querySelector('.btn-edit');
-            const deleteBtn = tr.querySelector('.btn-delete');
-
-            editBtn.addEventListener('click', () => openEditModal(user.id));
-            deleteBtn.addEventListener('click', () => openDeleteModal(user.id));
-        });
-    }
-
-    async function openEditModal(id) {
-        const res = await fetch(`/api/admin/users/${id}`);
-        const user = await res.json();
-        fillRoleSelect('editRoles', user.roles.map(r => r.id));
-        document.getElementById('editId').value = user.id;
-        document.getElementById('editRealUsername').value = user.realUsername;
-        document.getElementById('editLastName').value = user.lastName;
-        document.getElementById('editAge').value = user.age;
-        document.getElementById('editEmail').value = user.email;
-        document.getElementById('editPassword').value = '';
-        document.getElementById('editForm').onsubmit = async e => {
-            e.preventDefault();
-            const body = {
-                realUsername:document.getElementById('editRealUsername').value,
-                lastName: document.getElementById('editLastName').value,
-                age: document.getElementById('editAge').value,
-                email: document.getElementById('editEmail').value,
-                password: document.getElementById('editPassword').value,
-                roles: [...document.getElementById('editRoles').selectedOptions].map(o => ({ id: +o.value }))
-            };
-            await fetch(`/api/admin/update?id=${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken }, body: JSON.stringify(body), credentials: 'same-origin' });
-            bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
-            await fetchUsers();
-        };
-        new bootstrap.Modal(document.getElementById('editModal')).show();
-    }
-
-    async function openDeleteModal(id) {
-        const res = await fetch(`/api/admin/users/${id}`);
-        const user = await res.json();
-        fillRoleSelect('deleteRoles', user.roles.map(r => r.id), true);
-        deleteId.value = user.id;
-        deleteRealUsername.value = user.realUsername;
-        deleteLastName.value = user.lastName;
-        deleteAge.value = user.age;
-        deleteEmail.value = user.email;
-        deleteForm.onsubmit = async e => {
-            e.preventDefault();
-            await fetch(`/api/admin/delete?id=${id}`, { method: 'DELETE', headers : { [csrfHeader]: csrfToken }, credentials: 'same-origin' });
-            bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
-            await fetchUsers();
+        function getUserIdFromUrl() {
+            const pathParts = window.location.pathname.split('/');
+            return pathParts[pathParts.length - 1];
         }
-        new bootstrap.Modal(document.getElementById('deleteModal')).show();
-    }
 
-    async function loadCurrentUserInfo() {
-        const res = await fetch('/api/admin/me');
-        const user = await res.json();
+        async function fetchRoles() {
+            const res = await fetch('/api/admin/roles');
+            const data = await res.json();
+            allRoles.length = 0;
+            data.forEach(r => allRoles.push(r));
+        }
 
-        document.getElementById("user-email-and-roles").innerHTML =
-            `<strong>${user.email}</strong> with roles: ${user.roles.map(role => `<span class="badge bg-info text-dark">${role.role.replace('ROLE_', '')}</span>`).join(' ')}`;
+        async function fillRoleSelect(id, selected = [], disabled = false) {
+            await fetchRoles();
+            const sel = document.getElementById(id);
+            sel.innerHTML = '';
+            allRoles.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r.id;
+                opt.text = r.role.replace('ROLE_', '');
+                opt.selected = selected.includes(r.id);
+                opt.disabled = disabled;
+                sel.appendChild(opt);
+            });
+        }
 
+        async function fetchUsers() {
+            const res = await fetch('/api/admin/users');
+            const users = await res.json();
+            const tbody = document.querySelector("#users-info-body");
+            tbody.innerHTML = '';
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.realUsername}</td>
+                    <td>${user.lastName}</td>
+                    <td>${user.age}</td>
+                    <td>${user.email}</td>
+                    <td>${user.roles.map(r => r.role.replace('ROLE_', '')).join(', ')}</td>
+                    <td><button class='btn btn-primary btn-sm btn-edit'>Edit</button></td>
+                    <td><button class='btn btn-danger btn-sm btn-delete'>Delete</button></td>`;
+                tbody.appendChild(tr);
+                const editBtn = tr.querySelector('.btn-edit');
+                const deleteBtn = tr.querySelector('.btn-delete');
 
-        // Обновим ссылку на user-профиль
-        const userLink = document.getElementById('user-link');
-        userLink.href = `/user/${user.id}`;
-    }
+                editBtn.addEventListener('click', () => openEditModal(user.id));
+                deleteBtn.addEventListener('click', () => openDeleteModal(user.id));
+            });
+        }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-        await fetchUsers();
-        await fillRoleSelect('newUserRoles');
-        await loadCurrentUserInfo();
+        async function openEditModal(id) {
+            const res = await fetch(`/api/admin/users/${id}`);
+            const user = await res.json();
+            await fillRoleSelect('editRoles', user.roles.map(r => r.id));
+            document.getElementById('editId').value = user.id;
+            document.getElementById('editRealUsername').value = user.realUsername;
+            document.getElementById('editLastName').value = user.lastName;
+            document.getElementById('editAge').value = user.age;
+            document.getElementById('editEmail').value = user.email;
+            document.getElementById('editPassword').value = '';
+            document.getElementById('editForm').onsubmit = async e => {
+                e.preventDefault();
+                const body = {
+                    realUsername: document.getElementById('editRealUsername').value,
+                    lastName: document.getElementById('editLastName').value,
+                    age: document.getElementById('editAge').value,
+                    email: document.getElementById('editEmail').value,
+                    password: document.getElementById('editPassword').value,
+                    roles: [...document.getElementById('editRoles').selectedOptions].map(o => ({ id: +o.value }))
+                };
+                await fetch(`/api/admin/update?id=${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
+                    body: JSON.stringify(body),
+                    credentials: 'same-origin'
+                });
+                bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+                await fetchUsers();
+            };
+            new bootstrap.Modal(document.getElementById('editModal')).show();
+        }
 
-        newUserForm.onsubmit = async e => {
+        async function openDeleteModal(id) {
+            const res = await fetch(`/api/admin/users/${id}`);
+            const user = await res.json();
+            await fillRoleSelect('deleteRoles', user.roles.map(r => r.id), true);
+            document.getElementById('deleteId').value = user.id;
+            document.getElementById('deleteRealUsername').value = user.realUsername;
+            document.getElementById('deleteLastName').value = user.lastName;
+            document.getElementById('deleteAge').value = user.age;
+            document.getElementById('deleteEmail').value = user.email;
+            document.getElementById('deleteForm').onsubmit = async e => {
+                e.preventDefault();
+                await fetch(`/api/admin/delete?id=${id}`, {
+                    method: 'DELETE',
+                    headers: { [csrfHeader]: csrfToken },
+                    credentials: 'same-origin'
+                });
+                bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+                await fetchUsers();
+            };
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+
+        async function loadCurrentUserInfo() {
+            const res = await fetch('/api/admin/me');
+            const user = await res.json();
+            document.getElementById("user-email-and-roles").innerHTML =
+                `<strong>${user.email}</strong> with roles: ${user.roles.map(role => `<span class="badge bg-info text-dark">${role.role.replace('ROLE_', '')}</span>`).join(' ')}`;
+            const userLink = document.getElementById('user-link');
+            userLink.href = `/user/${user.id}`;
+        }
+
+        fetchUsers();
+        fillRoleSelect('newUserRoles');
+        loadCurrentUserInfo();
+
+        document.getElementById('newUserForm').onsubmit = async e => {
             e.preventDefault();
             const body = {
-                realUsername:document.getElementById('newRealUsername').value,
+                realUsername: document.getElementById('newRealUsername').value,
                 lastName: document.getElementById('newLastName').value,
                 age: document.getElementById('newAge').value,
-              email: document.getElementById('newEmail').value,
+                email: document.getElementById('newEmail').value,
                 password: document.getElementById('newPassword').value,
-                roles: [...newUserRoles.selectedOptions].map(o => ({ id: +o.value }))
+                roles: [...document.getElementById('newUserRoles').selectedOptions].map(o => ({ id: +o.value }))
             };
-            await fetch('/api/admin/new', { method: 'POST', headers: { 'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken }, body: JSON.stringify(body), credentials: 'same-origin' });
+            await fetch('/api/admin/new', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
+                body: JSON.stringify(body),
+                credentials: 'same-origin'
+            });
             await fetchUsers();
-            newUserForm.reset();
+            document.getElementById('newUserForm').reset();
             bootstrap.Tab.getOrCreateInstance(document.querySelector('a[href="#users"]')).show();
         }
-    });
 
-    window.openEditModal = openEditModal;
-    window.openDeleteModal = openDeleteModal;
+    });
 </script>
 
 
