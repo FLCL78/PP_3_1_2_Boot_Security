@@ -49,7 +49,7 @@ public class RESTAdminController {
     }
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getOneUser(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(userService.show(id));
+        return ResponseEntity.ok(userService.findUserWithRolesById(id));
     }
 
     @GetMapping("/me")

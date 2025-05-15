@@ -6,6 +6,8 @@
     <title>Admin Panel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
     <style>
         body {
@@ -248,23 +250,23 @@
                 <form id="newUserForm">
                     <div class="mb-3">
                         <label class="form-label">First name</label>
-                        <input type="text" class="form-control" name="realUsername" required>
+                        <input type="text" class="form-control" id="newRealUsername" name="realUsername" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Last name</label>
-                        <input type="text" class="form-control" name="lastName" required>
+                        <input type="text" class="form-control" id="newLastName" name="lastName" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Age</label>
-                        <input type="number" class="form-control" name="age" required>
+                        <input type="number" class="form-control" id="newAge" name="age" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Email</label>
-                        <input type="email" class="form-control" name="username" required>
+                        <input type="email" class="form-control" id="newEmail" name="email" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Password</label>
-                        <input type="password" class="form-control" name="password" required>
+                        <input type="password" class="form-control" id="newPassword" name="password" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Role</label>
@@ -296,7 +298,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">First name</label>
-                        <input type="text" class="form-control" id="editFirstName" name="username" required>
+                        <input type="text" class="form-control" id="editRealUsername" name="RealUsername" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Last name</label>
@@ -346,7 +348,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">First name</label>
-                        <input type="text" class="form-control" id="deleteFirstName" disabled>
+                        <input type="text" class="form-control" id="deleteRealUsername" disabled>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Last name</label>
@@ -380,6 +382,10 @@
         crossorigin="anonymous"></script>
 
 <script>
+
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
     const allRoles = [];
 
     async function fetchRoles() {
@@ -417,9 +423,14 @@
                 <td>${user.age}</td>
                 <td>${user.email}</td>
                 <td>${user.roles.map(r => r.role.replace('ROLE_', '')).join(', ')}</td>
-                <td><button class='btn btn-primary btn-sm' onclick='openEditModal(${user.id})'>Edit</button></td>
-                <td><button class='btn btn-danger btn-sm' onclick='openDeleteModal(${user.id})'>Delete</button></td>`;
+                <td><button class='btn btn-primary btn-sm btn-edit'>Edit</button></td>
+                <td><button class='btn btn-danger btn-sm btn-delete'>Delete</button></td>`;
             tbody.appendChild(tr);
+            const editBtn = tr.querySelector('.btn-edit');
+            const deleteBtn = tr.querySelector('.btn-delete');
+
+            editBtn.addEventListener('click', () => openEditModal(user.id));
+            deleteBtn.addEventListener('click', () => openDeleteModal(user.id));
         });
     }
 
@@ -428,7 +439,7 @@
         const user = await res.json();
         fillRoleSelect('editRoles', user.roles.map(r => r.id));
         document.getElementById('editId').value = user.id;
-        document.getElementById('editFirstName').value = user.realUsername;
+        document.getElementById('editRealUsername').value = user.realUsername;
         document.getElementById('editLastName').value = user.lastName;
         document.getElementById('editAge').value = user.age;
         document.getElementById('editEmail').value = user.email;
@@ -436,14 +447,15 @@
         document.getElementById('editForm').onsubmit = async e => {
             e.preventDefault();
             const body = {
-                realUsername: editFirstName.value,
-                lastName: editLastName.value,
-                age: editAge.value,
-               email: editEmail.value,
-                password: editPassword.value,
-                roles: [...editRoles.selectedOptions].map(o => +o.value)
+                realUsername:document.getElementById('editRealUsername').value,
+                lastName: document.getElementById('editLastName').value,
+                age: document.getElementById('editAge').value,
+                email: document.getElementById('editEmail').value,
+                password: document.getElementById('editPassword').value,
+                roles: [...document.getElementById('editRoles').selectedOptions].map(o => ({ id: +o.value }))
             };
-            await fetch(`/api/admin/users/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            await fetch(`/api/admin/update?id=${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken }, body: JSON.stringify(body), credentials: 'same-origin' });
             bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
             await fetchUsers();
         };
@@ -455,13 +467,13 @@
         const user = await res.json();
         fillRoleSelect('deleteRoles', user.roles.map(r => r.id), true);
         deleteId.value = user.id;
-        deleteFirstName.value = user.realUsername;
+        deleteRealUsername.value = user.realUsername;
         deleteLastName.value = user.lastName;
         deleteAge.value = user.age;
         deleteEmail.value = user.email;
         deleteForm.onsubmit = async e => {
             e.preventDefault();
-            await fetch(`/api/admin/delete/${id}`, { method: 'DELETE' });
+            await fetch(`/api/admin/delete?id=${id}`, { method: 'DELETE', headers : { [csrfHeader]: csrfToken }, credentials: 'same-origin' });
             bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
             await fetchUsers();
         }
@@ -489,19 +501,23 @@
         newUserForm.onsubmit = async e => {
             e.preventDefault();
             const body = {
-                realUsername: newUserForm.realUsername.value,
-                lastName: newUserForm.lastName.value,
-                age: newUserForm.age.value,
-               email: newUserForm.email.value,
-                password: newUserForm.password.value,
-                roles: [...newUserRoles.selectedOptions].map(o => +o.value)
+                realUsername:document.getElementById('newRealUsername').value,
+                lastName: document.getElementById('newLastName').value,
+                age: document.getElementById('newAge').value,
+              email: document.getElementById('newEmail').value,
+                password: document.getElementById('newPassword').value,
+                roles: [...newUserRoles.selectedOptions].map(o => ({ id: +o.value }))
             };
-            await fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            await fetch('/api/admin/new', { method: 'POST', headers: { 'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken }, body: JSON.stringify(body), credentials: 'same-origin' });
             await fetchUsers();
             newUserForm.reset();
             bootstrap.Tab.getOrCreateInstance(document.querySelector('a[href="#users"]')).show();
         }
     });
+
+    window.openEditModal = openEditModal;
+    window.openDeleteModal = openDeleteModal;
 </script>
 
 

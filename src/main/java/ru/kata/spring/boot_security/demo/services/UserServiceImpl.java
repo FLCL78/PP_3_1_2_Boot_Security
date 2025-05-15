@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,13 +22,15 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userDao;
     private final RoleService roleService;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
 
     @Autowired
-    public UserServiceImpl(UserRepository userDao, RoleService roleService, BCryptPasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userDao, RoleService roleService, BCryptPasswordEncoder passwordEncoder, UserRepository userRepository) {
         this.userDao = userDao;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -74,5 +77,12 @@ public class UserServiceImpl implements UserService{
     @Transactional
     public void delete(Long id) {
         userDao.deleteById(id);
+    }
+
+
+    @Override
+    @Transactional
+    public User findUserWithRolesById(Long id) {
+        return userRepository.findUserWithRolesById(id).orElseThrow(() -> new UsernameNotFoundException("Потеря потерь"));
     }
 }
