@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <style>
+        .form-container form {
+            margin-top: 0.5rem;
+        }
+        .form-container {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .bold-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-align: left;
+        }
+        .form-group {
+            margin-bottom: 0.0rem;
+        }
+        .narrow-input {
+            max-width: 300px;
+            margin-bottom: 0;
+        }
+        .btn-signin {
+            margin-top: 0.5rem;
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="form-container">
+                <h2 class="bold-title">Please sign in</h2>
+                <form id="login-form">
+                    <div class="form-group narrow-input">
+                        <input type="text" class="form-control" id="username" name="username"placeholder="User name"required>
+                    </div>
+                    <div class="form-group narrow-input">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                    </div>
+                    <div class="d-grid narrow-input">
+                        <button type="submit"class="btn btn-primary btn-signin">Sign in</button>
+                    </div>
+                    <div id="error-msg" class="text-danger mt-2" style="display: none;">Неверный логин или пароль</div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+<script>
+
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    document.getElementById('login-form').addEventListener("submit", async (e) =>{
+        e.preventDefault();
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        const csrfToken = getCookie('XSRF-TOKEN');
+
+        const response = await fetch('/login',
+            { method : 'POST',
+            headers : {
+                'Content-Type' : 'application/json',
+                'X-XSRF-TOKEN' : csrfToken
+            },
+            body : JSON.stringify({username, password}),
+            credentials : 'same-origin'
+            });
+
+        if (response.ok) {
+            // запрос ролей
+            const meResponse = await fetch('/api/user/me', {
+                method: 'GET',
+                credentials: 'same-origin'
+            });
+
+            if (meResponse.ok) {
+                const user = await meResponse.json();
+                const roles = user.roles.map(r => r.role);
+
+                if (roles.includes("ROLE_ADMIN")) {
+                    window.location.href = "/admin";
+                } else if (roles.includes("ROLE_USER")) {
+                    window.location.href = "/user";
+                } else {
+                    window.location.href = "/"; // на всякий случай
+                }
+            } else {
+                document.getElementById("error-msg").innerText = "Не удалось определить роль пользователя";
+                document.getElementById("error-msg").style.display = "block";
+            }
+
+        } else {
+            document.getElementById("error-msg").style.display = "block";
+        }
+    });
+
+</script>
+
+</body>
+</html>
