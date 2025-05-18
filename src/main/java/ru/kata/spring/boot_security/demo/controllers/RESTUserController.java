@@ -14,8 +14,8 @@ import ru.kata.spring.boot_security.demo.model.User;
 public class RESTUserController {
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> showUser(@PathVariable("id") Long id, Authentication authentication) {
+    @GetMapping()
+    public ResponseEntity<?> showUser(Authentication authentication) {
         //Добываем юзера аутентифицированного
         User currentUser = (User) authentication.getPrincipal();
 
@@ -23,7 +23,7 @@ public class RESTUserController {
         boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
         //Только на своей странице будь, а админу можно всё.
-        if(!isAdmin && !currentUser.getId().equals(id)) {
+        if(!isAdmin) {
             return ResponseEntity.status(403).body("Доступ не доступ");
         }
 

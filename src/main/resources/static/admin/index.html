@@ -521,7 +521,7 @@
             document.getElementById("user-email-and-roles").innerHTML =
                 `<strong>${user.email}</strong> with roles: ${user.roles.map(role => `<span class="badge bg-info text-dark">${role.role.replace('ROLE_', '')}</span>`).join(' ')}`;
             const userLink = document.getElementById('user-link');
-            userLink.href = `/user/${user.id}`;
+            userLink.href = `/user`;
         }
 
         fetchUsers();
