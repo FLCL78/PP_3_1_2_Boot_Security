@@ -9,7 +9,6 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        System.out.println("✅ MvcConfig ИНИЦИАЛИЗИРОВАН");
         registry.addViewController("/login").setViewName("forward:/login/index.html");
         registry.addViewController("/admin").setViewName("forward:/admin/index.html");
         registry.addViewController("/user").setViewName("forward:/user/index.html");
